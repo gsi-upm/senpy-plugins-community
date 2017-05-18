@@ -57,7 +57,7 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
         self._categories = {'anger': ['general-dislike',],
                             'fear': ['negative-fear',],
                             'disgust': ['shame',],
-                            'joy': ['gratitude','affective','enthusiasm','love','joy','liking'],
+                            'joy': ['gratitude','affection','enthusiasm','love','joy','liking'],
                             'sadness': ['ingrattitude','daze','humility','compassion','despair','anxiety','sadness']}
 
         self._wnaffect_mappings = {'anger': 'anger',
