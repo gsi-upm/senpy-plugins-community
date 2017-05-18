@@ -22,7 +22,8 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
     
   
     def _load_synsets(self, synsets_path):
-        """Returns a dictionary POS tag -> synset offset -> emotion (str -> int -> str)."""
+        """Returns a dictionary synset offset -> emotion (int -> str)."""
+        # """Returns a dictionary POS tag -> synset offset -> emotion (str -> int -> str)."""
         tree = ET.parse(synsets_path)
         root = tree.getroot()
         pos_map = { "noun": "NN", "adj": "JJ", "verb": "VB", "adv": "RB" }
@@ -59,17 +60,20 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
         nltk.download('stopwords')
         self._stopwords = stopwords.words('english')
         #local_path=os.path.dirname(os.path.abspath(__file__))
-        self._categories = {'anger': ['general-dislike',],
-                            'fear': ['negative-fear',],
-                            'disgust': ['shame',],
-                            'joy': ['gratitude','affective','enthusiasm','love','joy','liking'],
-                            'sadness': ['ingrattitude','daze','humility','compassion','despair','anxiety','sadness']}
+        # level 5 or higher categories corresponding to each Ekman emotion
+        self._categoryLevels = [5,6,7]
+        self._categories = {'anger': [set(), set(['hate']), set(['anger'])],
+                            'fear': [set(['negative-fear','ambiguous-fear']), set(), set()],
+                            'disgust': [set(), set(['self-disgust']), set(['antipathy', 'contempt', 'disgust', 'alienation'])],
+                            'joy': [set(['gratitude','levity','affection','enthusiasm','love','joy','liking']), set(), set()],
+                            'sadness': [set(['ingrattitude','daze','humility','compassion','despair','anxiety','sadness']), set(), set()],
+                            'surprise' : [set(['surprise']), set(), set()]}
 
-        self._wnaffect_mappings = {'anger': 'anger',
-                                   'fear': 'negative-fear',
-                                   'disgust': 'disgust',
-                                   'joy': 'joy',
-                                   'sadness': 'sadness'}
+        # self._wnaffect_mappings = {'anger': 'anger',
+        #                            'fear': 'negative-fear',
+        #                            'disgust': 'disgust',
+        #                            'joy': 'joy',
+        #                            'sadness': 'sadness'}
 
 
         self._load_emotions(self.hierarchy_path)
@@ -159,14 +163,14 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
                     if offset in self._total_synsets:
                         # if self._total_synsets[pos_tagged[i]][offset] is None:
                         if self._total_synsets[offset] is None:
-                            # continue
-                            pass
+                            continue
                         else:
                             # emotion = self._total_synsets[pos_tagged[i]][offset].get_level(5).name
-                            emotion = self._total_synsets[offset].get_level(5).name
+                            synsetEmo = self._total_synsets[offset]
+                            emotion = [synsetEmo.get_level(j).name for j in _categoryLevels]
                             matches+=1
-                            for i in self._categories:
-                                if emotion in self._categories[i]:
+                            for i,emoEmotions in self._categories.items():
+                                if any( emotion[j] in emoEmotions[j] for j in range(len(_categoryLevels)) ):
                                     feature_set[i]+=1
         if matches == 0:
             matches=1                
@@ -190,7 +194,8 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
         emotions = emotionSet.onyx__hasEmotion
 
         for i in feature_text:
-            emotions.append(Emotion(onyx__hasEmotionCategory=self._wnaffect_mappings[i],
+            # emotions.append(Emotion(onyx__hasEmotionCategory=self._wnaffect_mappings[i],
+            emotions.append(Emotion(onyx__hasEmotionCategory=i,
                                     onyx__hasEmotionIntensity=feature_text[i]))
 
         entry.emotions = [emotionSet]
