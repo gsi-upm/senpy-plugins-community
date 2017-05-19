@@ -109,7 +109,6 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
 
 
     def activate(self, *args, **kwargs):
-        print(dir(self))
         nltk.download('stopwords')
         
         if 'stopwords' not in self.sh:
@@ -177,7 +176,6 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
             synsets = set(wn3id(syn) for syn in wn.synsets(ngrams_words[i], lang=language))
             logger.info("synsets for %s in %s : %s"%(ngrams_words[i], language, len(synsets)))
             for syn_id in synsets & self._total_synsets_offsets:
-                logger.info("%s %8s %20s"%(syn_id, type(syn_id)))
                 logger.info("synset offset %s in wnaffect! %20s"%(syn_id, ngrams_words[i])) 
                 if self._total_synsets[syn_id] is None:
                     continue
