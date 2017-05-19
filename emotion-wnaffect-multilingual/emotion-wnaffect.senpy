@@ -17,6 +17,7 @@ extra_params:
     - en
 synsets_path: "/data/emotion-wnaffect/a-synsets.xml"
 hierarchy_path: "/data/emotion-wnaffect/a-hierarchy.xml"
+mapping_wn16_30_path: "/data/emotion-wnaffect/mapping-16-30/wn16-30."
 onyx:usesEmotionModel: emoml:big6
 requirements:
 - nltk>=3.0.5

@@ -25,9 +25,9 @@ wn16 = WordNetCorpusReader(wn16_path, nltk.data.find(wn16_path))
 #  the second param should be an omw_reader !! (:
 
 
-# In[6]:
+# In[ ]:
 
-get_ipython().magic('pinfo wn16.synsets')
+wn16.synsets("sad")
 
 
 # In[3]:
@@ -35,24 +35,43 @@ get_ipython().magic('pinfo wn16.synsets')
 nltk.download("omw")
 
 
+# ## testing nltk.corpus.stopwords for multilingual text
+
+# In[40]:
+
+stopwords.words("README")
+
+
 # ## nltk.corpus.wn and multilingual wn experiments
 
-# In[1]:
+# In[47]:
 
 from nltk.corpus import wordnet as wn
-print(", ".join(wn.langs()))
+print(", ".join(l for l in wn.langs() if len(l)==3))
+print()
+print(", ".join(sorted(l for l in wn.langs() if len(l)==2)))
+print()
+print(", ".join(sorted(l for l in wn.langs())))
 
 
-# In[16]:
+# In[33]:
+
+from nltk.corpus import wordnet as wn
+syn = wn.synsets("sad")[0]
+"%d-%s"%(syn.offset(), syn.pos())
+
+
+# In[48]:
 
 syns = wn.synsets("hlad",lang='cs')
-print(len(syns))
+print(len(syns), type(syns))
 print(len(set(syn.offset() for syn in syns)))
 
 
 # In[2]:
 
 Emo.emotions = {}
+# This is not changed from the original
 def _load_emotions(self, hierarchy_path):
     """Loads the hierarchy of emotions from the WordNet-Affect xml."""
 
@@ -67,7 +86,7 @@ def _load_emotions(self, hierarchy_path):
 _load_emotions(None, "wn-affect-1.1/a-hierarchy.xml")
 
 
-# In[3]:
+# In[14]:
 
 mapping_wn16_30_path = "mapping-16-30"
 wn16_30 = {}
@@ -107,7 +126,7 @@ def _load_synsets(self, synsets_path):
         except KeyError:
             # unconvertedSynsetIds.append((wn16id, pos_char, wn16_offset))
             return None
-    
+
     tree = ET.parse(synsets_path)
     root = tree.getroot()
 
@@ -125,8 +144,9 @@ def _load_synsets(self, synsets_path):
                 try:
                     synsets[wn30_id] = synsets[convertId(elem.get("noun-id"))]
                 except KeyError:
-                    if wn30_id[:12] != "unconverted-":
-                        pending.append((wn30_id, convertId(elem.get("noun-id"))))
+                    newid = convertId(elem.get("noun-id"))
+                    if newid is not None:
+                        pending.append((wn30_id, newid))
     for (wn30_id, noun_id) in pending:
         try:
             synsets[wn30_id] = synsets[noun_id]
@@ -139,6 +159,16 @@ def _load_synsets(self, synsets_path):
 # In[5]:
 
 wnaff = _load_synsets(None, "wn-affect-1.1/a-synsets.xml")
+
+
+# In[17]:
+
+1361863 in wnaff
+
+
+# In[19]:
+
+list(wnaff.keys())[:5]
 
 
 # In[6]:
