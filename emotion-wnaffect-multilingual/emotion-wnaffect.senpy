@@ -1,6 +1,6 @@
 ---
-name: emotion-wnaffect
-module: emotion-wnaffect
+name: emotion-wnaffect-polylingual
+module: emotion-wnaffect-polylingual
 description: 'Emotion classifier using WordNet-Affect to calculate the percentage
   of each emotion. This plugin classifies among 6 emotions: anger,fear,disgust,joy,sadness
   or neutral. The only available language is English (en)'
@@ -65,9 +65,9 @@ extra_params:
     - swe
     - tha
     - zsm
-synsets_path: "/data/emotion-wnaffect/a-synsets.xml"
-hierarchy_path: "/data/emotion-wnaffect/a-hierarchy.xml"
-mapping_wn16_30_path: "/data/emotion-wnaffect/mapping-16-30/wn16-30."
+synsets_path: "wn-affect-1.1/a-synsets.xml"
+hierarchy_path: "wn-affect-1.1/a-hierarchy.xml"
+mapping_wn16_30_path: "mapping-16-30/wn16-30."
 onyx:usesEmotionModel: emoml:big6
 requirements:
 - nltk>=3.0.5
