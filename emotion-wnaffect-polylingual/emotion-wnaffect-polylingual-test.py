@@ -44,14 +44,15 @@ stopwords.words("README")
 
 # ## nltk.corpus.wn and multilingual wn experiments
 
-# In[47]:
+# In[3]:
 
 from nltk.corpus import wordnet as wn
-print(", ".join(l for l in wn.langs() if len(l)==3))
-print()
-print(", ".join(sorted(l for l in wn.langs() if len(l)==2)))
-print()
-print(", ".join(sorted(l for l in wn.langs())))
+print(" ".join(l for l in wn.langs() if len(l)==3))
+print(sum(1 for l in wn.langs() if len(l)==3))
+print(" ".join(sorted(l for l in wn.langs() if len(l)==2)))
+print(sum(1 for l in wn.langs() if len(l)==2))
+# print()
+# print(", ".join(sorted(l for l in wn.langs())))
 
 
 # In[33]:
