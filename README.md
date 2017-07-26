@@ -8,6 +8,27 @@ This plugin uses WordNet-Affect (http://wndomains.fbk.eu/wnaffect.html) to calcu
 - joy : gratitude, affective, enthusiasm, love, joy, liking
 - sadness : ingrattitude, daze, humlity, compassion, despair, anxiety, sadness
 
+## Installation
+
+* Download
+```
+git clone https://lab.cluster.gsi.dit.upm.es/senpy/emotion-wnaffect.git
+```
+* Get data
+```
+cd emotion-wnaffect
+git submodule update --init --recursive
+```
+* Run 
+```
+docker run -p 5000:5000 -v $PWD:/plugins gsiupm/senpy -f /plugins
+```
+
+## Data format
+
+`data/a-hierarchy.xml` is a xml file
+`data/a-synsets.xml` is a xml file
+
 ## Usage
 
 The parameters accepted are:
