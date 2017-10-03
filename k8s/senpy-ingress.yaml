@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: senpy-ingress
+  name: ${NAME}
 spec:
   rules:
   - host: ${NAME}.senpy.cluster.gsi.dit.upm.es

@@ -13,10 +13,11 @@ spec:
     spec:
       containers:
       - name: senpy-latest
-        image: ${CI_REGISTRY_IMAGE}
+        image: ${CI_REGISTRY_IMAGE}:${VERSION}
         imagePullPolicy: Always
         args:
-          - "--folder /senpy-plugins"
+          - "-f"
+          - "/senpy-plugins"
         resources:
           limits:
             memory: "512Mi"
