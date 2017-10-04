@@ -1,0 +1,10 @@
+version: '3'
+services:
+    dev:
+        image: gsiupm/senpy:latest
+        entrypoint: ["/bin/bash"]
+        working_dir: "/senpy-plugins"
+        ports:
+            - 5000:5000
+        volumes:
+            - ".:/senpy-plugins"

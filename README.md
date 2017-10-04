@@ -27,7 +27,7 @@ http://senpy.cluster.gsi.dit.upm.es/api/?algo=meaningCloud&language=en&apiKey=<p
 
 Example respond: This plugin follows the standard for the senpy plugin response. For more information, please visit [senpy documentation](http://senpy.readthedocs.io). Specifically, NIF API section. 
 
-This plugin supports **python3**
+This plugin supports **python2.7** and **python3**.
 
 ![alt GSI Logo][logoGSI]
 
