@@ -94,13 +94,12 @@ class MeaningCloudPlugin(SentimentPlugin):
                 count += 1
                 entry.sentiments.append(opinion)
 
-        print(api_response_topics['entity_list'])
         mapper = {'es': 'es.', 'en': ''}
         for sent_entity in api_response_topics['entity_list']:
             entity = Sentiment(
                 id="Entity{}".format(sent_entity.get('id')),
                 rdfs__subClassOf="http://{}dbpedia.org/resource/{}".format(
-                    mapper[lang], sent_entity.get('form', None)),
+                    mapper[lang], sent_entity['semld_list'][0].split("/")[-1]),
                 nif__anchorOf=sent_entity.get('form', None),
                 nif__beginIndex=sent_entity['variant_list'][0].get('inip', None),
                 nif__endIndex=sent_entity['variant_list'][0].get('endp', None))
