@@ -41,7 +41,6 @@ class MeaningCloudPlugin(SentimentPlugin):
         model = "general"  # general_es / general_es / general_fr
         api = 'http://api.meaningcloud.com/'
         lang = params.get("language")
-        print(params)
         key = params["apiKey"]
         parameters = {
             'key': key,
@@ -61,8 +60,6 @@ class MeaningCloudPlugin(SentimentPlugin):
 
         api_response = r.json()
         api_response_topics = r2.json()
-        print("api")
-        print(api_response_topics)
         if not api_response.get('score_tag'):
             raise Error(r.json())
 
@@ -95,11 +92,14 @@ class MeaningCloudPlugin(SentimentPlugin):
                 entry.sentiments.append(opinion)
 
         mapper = {'es': 'es.', 'en': ''}
+
         for sent_entity in api_response_topics['entity_list']:
+            
+            resource = "_".join(sent_entity.get('form', None).split())
             entity = Sentiment(
                 id="Entity{}".format(sent_entity.get('id')),
                 rdfs__subClassOf="http://{}dbpedia.org/resource/{}".format(
-                    mapper[lang], sent_entity['semld_list'][0].split("/")[-1]),
+                    mapper[lang], resource),
                 nif__anchorOf=sent_entity.get('form', None),
                 nif__beginIndex=sent_entity['variant_list'][0].get('inip', None),
                 nif__endIndex=sent_entity['variant_list'][0].get('endp', None))
