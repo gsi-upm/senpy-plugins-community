@@ -1,6 +1,3 @@
-from unittest import mock
-
-
 def mocked_requests_post(*args, **kwargs):
     class MockResponse:
         def __init__(self, json_data, status_code):

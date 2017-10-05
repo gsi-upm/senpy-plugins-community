@@ -12,7 +12,11 @@ from senpy.plugins import SentimentPlugin
 from senpy.models import Results, Entry, Sentiment, Error
 
 import mocked_request
-from unittest import mock
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 logger = logging.getLogger(__name__)
 
