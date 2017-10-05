@@ -42,7 +42,7 @@ push-latest:
   variables:
     PYTHON_VERSION: latest
   only:
-    - master
+    - tags
     - triggers
 
 deploy:
@@ -51,7 +51,8 @@ deploy:
   script:
     - make -e deploy
   only:
-    - master
+    - tags
+    - triggers
 
 clean :
   stage: clean
