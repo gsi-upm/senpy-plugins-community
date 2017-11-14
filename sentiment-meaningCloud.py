@@ -60,8 +60,8 @@ class MeaningCloudPlugin(SentimentPlugin):
         except requests.exceptions.Timeout:
             raise Error("Meaning Cloud API does not response")
 
-        api_response = json.loads(r.content.decode('utf-8'))
-        api_response_topics = json.loads(r2.content.decode('utf-8'))
+        api_response = r.json()
+        api_response_topics = r2.json()
         if not api_response.get('score_tag'):
             raise Error(r.json())
         entry['language_detected'] = lang
@@ -106,7 +106,7 @@ class MeaningCloudPlugin(SentimentPlugin):
                 nif__beginIndex=sent_entity['variant_list'][0].get('inip', None),
                 nif__endIndex=sent_entity['variant_list'][0].get('endp', None))
             entity[
-                '@type'] = "https://www.meaningcloud.com/developer/documentation/ontology#ODENTITY_{}".format(
+                '@type'] = "ODENTITY_{}".format(
                     sent_entity['sementity'].get('type', None).split(">")[-1])
             entry.entities.append(entity)
 
@@ -118,7 +118,7 @@ class MeaningCloudPlugin(SentimentPlugin):
                         rdfs__subClassOf="http://dbpedia.org/resource/{}".
                         format(theme['type'].split('>')[-1]))
                     concept[
-                        '@type'] = "https://www.meaningcloud.com/developer/documentation/ontology#ODTHEME_{}".format(
+                        '@type'] = "ODTHEME_{}".format(
                             theme['type'].split(">")[-1])
                     entry.topics.append(concept)
         yield entry
