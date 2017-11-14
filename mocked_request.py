@@ -10,6 +10,7 @@ def mocked_requests_post(*args, **kwargs):
     print("Mocking request")
     if args[0] == 'http://api.meaningcloud.com/sentiment-2.1':
         return MockResponse({
+            'model': 'general_es'
             'sentence_list': [{
                 'text':
                 'Hello World',
