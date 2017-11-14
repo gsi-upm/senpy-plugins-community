@@ -38,9 +38,9 @@ class MeaningCloudPlugin(SentimentPlugin):
     def analyse_entry(self, entry, params):
 
         txt = entry['nif:isString']
-        model = "general"  # general_es / general_es / general_fr
         api = 'http://api.meaningcloud.com/'
         lang = params.get("language")
+        model = "general"
         key = params["apiKey"]
         parameters = {
             'key': key,
@@ -53,16 +53,18 @@ class MeaningCloudPlugin(SentimentPlugin):
         try:
             r = requests.post(
                 api + "sentiment-2.1", params=parameters, timeout=3)
+            parameters['lang'] = r.json()['model'].split('_')[1]
+            lang = parameters['lang']
             r2 = requests.post(
                 api + "topics-2.0", params=parameters, timeout=3)
         except requests.exceptions.Timeout:
             raise Error("Meaning Cloud API does not response")
 
-        api_response = r.json()
-        api_response_topics = r2.json()
+        api_response = json.loads(r.content.decode('utf-8'))
+        api_response_topics = json.loads(r2.content.decode('utf-8'))
         if not api_response.get('score_tag'):
             raise Error(r.json())
-
+        entry['language_detected'] = lang
         logger.info(api_response)
         agg_polarity, agg_polarityValue = self._polarity(
             api_response.get('score_tag', None))
@@ -91,7 +93,7 @@ class MeaningCloudPlugin(SentimentPlugin):
                 count += 1
                 entry.sentiments.append(opinion)
 
-        mapper = {'es': 'es.', 'en': ''}
+        mapper = {'es': 'es.', 'en': '', 'ca': 'es.', 'it':'it.', 'fr':'fr.', 'pt':'pt.'}
 
         for sent_entity in api_response_topics['entity_list']:
             

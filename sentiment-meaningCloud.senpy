@@ -8,8 +8,8 @@
         "language": {
             "aliases": ["language", "l"],
             "required": true,
-            "options": ["en","es"],
-            "default": "en"
+            "options": ["en","es","ca","it","pt","fr","auto"],
+            "default": "auto"
         },
         "apiKey":{
             "aliases":["meaningCloud-key","apiKey"],
