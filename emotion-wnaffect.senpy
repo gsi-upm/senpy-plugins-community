@@ -15,9 +15,9 @@ extra_params:
     required: false
     options:
     - en
-synsets_path: "/data/emotion-wnaffect/a-synsets.xml"
-hierarchy_path: "/data/emotion-wnaffect/a-hierarchy.xml"
-wn16_path: "/data/emotion-wnaffect/wordnet1.6/dict"
+synsets_path: "/emotion-wnaffect/a-synsets.xml"
+hierarchy_path: "/emotion-wnaffect/a-hierarchy.xml"
+wn16_path: "/emotion-wnaffect/wordnet1.6/dict"
 onyx:usesEmotionModel: emoml:big6
 requirements:
 - nltk>=3.0.5

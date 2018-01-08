@@ -55,7 +55,7 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
         self._stopwords = stopwords.words('english')
         self._wnlemma = wordnet.WordNetLemmatizer()
         self._syntactics = {'N': 'n', 'V': 'v', 'J': 'a', 'S': 's', 'R': 'r'}
-        local_path = os.path.dirname(os.path.abspath(__file__))
+        local_path = os.environ.get("SENPY_DATA")
         self._categories = {
             'anger': [
                 'general-dislike',
@@ -222,3 +222,29 @@ class EmotionTextPlugin(EmotionPlugin, ShelfMixin):
         entry.emotions = [emotionSet]
 
         yield entry
+
+
+    def test(self, *args, **kwargs):
+        results = list()
+        params = {'algo': 'emotion-wnaffect', 
+                  'intype': 'direct', 
+                  'expanded-jsonld': 0, 
+                  'informat': 'text', 
+                  'prefix': '', 
+                  'plugin_type': 'analyPlugin', 
+                  'urischeme': 'RFC5147String', 
+                  'outformat': 'json-ld', 
+                  'i': 'Hello World', 
+                  'input': 'Hello World', 
+                  'conversion': 'full', 
+                  'language': 'en',
+                  'algorithm': 'emotion-wnaffect'}
+        for i in range(100):
+            res = next(self.analyse_entry(Entry(nif__isString="This text make me sad"), params))
+            results.append(res.emotions[0]['onyx:hasEmotion'][3])
+            results.append(res.emotions[0]['onyx:hasEmotion'][1])
+
+            assert 100 in results[i]['onyx:hasEmotionIntensity']
+            assert 'sadness' in results[i]['onyx:hasEmotionCategory']
+            assert 0 in results[i+1]['onyx:hasEmotionIntensity']
+            assert 'joy' in results[i+1]['onyx:hasEmotionCategory']
