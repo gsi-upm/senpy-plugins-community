@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 class MeaningCloudPlugin(SentimentPlugin):
+    
+    """MeaningCloud plugin uses API from Meaning Cloud to perform sentiment analysis."""
     def _polarity(self, value):
 
         if 'NONE' in value:
