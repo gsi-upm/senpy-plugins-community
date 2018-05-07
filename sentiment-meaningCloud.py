@@ -117,7 +117,7 @@ class MeaningCloudPlugin(SentimentPlugin):
                 for theme in topic['semtheme_list']:
                     concept = Sentiment(
                         id="Topic{}".format(topic.get('id')),
-                        rdfs__subClassOf="http://dbpedia.org/resource/{}".
+                        prov__wasDerivedBy="http://dbpedia.org/resource/{}".
                         format(theme['type'].split('>')[-1]))
                     concept[
                         '@type'] = "ODTHEME_{}".format(
@@ -145,8 +145,8 @@ class MeaningCloudPlugin(SentimentPlugin):
         for i in range(100):
             res = next(self.analyse_entry(Entry(nif__isString="Hello World Obama"), params))
             results.append(res.sentiments[0]['marl:hasPolarity'])
-            results.append(res.topics[0]['rdfs:subClassOf'])
-            results.append(res.entities[0]['rdfs:subClassOf'])
+            results.append(res.topics[0]['prov:wasDerivedBy'])
+            results.append(res.entities[0]['prov:wasDerivedBy'])
 
         assert 'marl:Neutral' in results
         assert 'http://dbpedia.org/resource/Astronomy' in results
