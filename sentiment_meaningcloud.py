@@ -22,7 +22,21 @@ logger = logging.getLogger(__name__)
 
 
 class MeaningCloudPlugin(SentimentPlugin):
-    
+    version = "0.1"
+
+    extra_params = {
+        "language": {
+            "aliases": ["language", "l"],
+            "required": True,
+            "options": ["en","es","ca","it","pt","fr","auto"],
+            "default": "auto"
+        },
+        "apikey":{
+            "aliases": ["apiKey", "meaningcloud-key", "meaningcloud-apikey"],
+            "required": True
+        }
+    }
+
     """MeaningCloud plugin uses API from Meaning Cloud to perform sentiment analysis."""
     def _polarity(self, value):
 
@@ -43,7 +57,7 @@ class MeaningCloudPlugin(SentimentPlugin):
         api = 'http://api.meaningcloud.com/'
         lang = params.get("language")
         model = "general"
-        key = params["apiKey"]
+        key = params["apikey"]
         parameters = {
             'key': key,
             'model': model,
@@ -102,7 +116,7 @@ class MeaningCloudPlugin(SentimentPlugin):
             resource = "_".join(sent_entity.get('form', None).split())
             entity = Sentiment(
                 id="Entity{}".format(sent_entity.get('id')),
-                rdfs__subClassOf="http://{}dbpedia.org/resource/{}".format(
+                marl__describesObject="http://{}dbpedia.org/resource/{}".format(
                     mapper[lang], resource),
                 nif__anchorOf=sent_entity.get('form', None),
                 nif__beginIndex=sent_entity['variant_list'][0].get('inip', None),
@@ -117,7 +131,7 @@ class MeaningCloudPlugin(SentimentPlugin):
                 for theme in topic['semtheme_list']:
                     concept = Sentiment(
                         id="Topic{}".format(topic.get('id')),
-                        prov__wasDerivedBy="http://dbpedia.org/resource/{}".
+                        prov__wasDerivedFrom="http://dbpedia.org/resource/{}".
                         format(theme['type'].split('>')[-1]))
                     concept[
                         '@type'] = "ODTHEME_{}".format(
@@ -140,15 +154,18 @@ class MeaningCloudPlugin(SentimentPlugin):
                   'input': 'Hello World', 
                   'conversion': 'full', 
                   'language': 'en',
-                  'apiKey': '00000', 
+                  'apikey': '00000', 
                   'algorithm': 'sentiment-meaningCloud'}
         for i in range(100):
             res = next(self.analyse_entry(Entry(nif__isString="Hello World Obama"), params))
             results.append(res.sentiments[0]['marl:hasPolarity'])
-            results.append(res.topics[0]['prov:wasDerivedBy'])
-            results.append(res.entities[0]['prov:wasDerivedBy'])
+            results.append(res.topics[0]['prov:wasDerivedFrom'])
+            results.append(res.entities[0]['prov:wasDerivedFrom'])
 
         assert 'marl:Neutral' in results
         assert 'http://dbpedia.org/resource/Astronomy' in results
         assert 'http://dbpedia.org/resource/Obama' in results
 
+if __name__ == '__main__':
+    from senpy import easy_test
+    easy_test()
