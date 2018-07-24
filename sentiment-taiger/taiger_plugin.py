@@ -9,14 +9,6 @@ from os import path
 import time
 from senpy.plugins import SentimentPlugin
 from senpy.models import Results, Entry, Entity, Topic, Sentiment, Error
-from senpy.utils import check_template
-
-from mocked_request import mocked_requests_get
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 TAIGER_ENDPOINT = os.environ.get("TAIGER_ENDPOINT")
 
@@ -32,7 +24,7 @@ class TaigerPlugin(SentimentPlugin):
     name = 'sentiment-taiger'
     author = 'GSI UPM'
     version = "0.1"
-    maxPolarityValue = -1
+    maxPolarityValue = 0
     minPolarityValue = -10
 
     extra_params = {
@@ -55,7 +47,7 @@ class TaigerPlugin(SentimentPlugin):
 
         txt = entry['nif:isString']
         if params.get("endpoint"):
-            api = params.get("endpoint")
+            api = params.get("endpoint", None)
         else:
             api = TAIGER_ENDPOINT
         parameters = {
@@ -66,13 +58,14 @@ class TaigerPlugin(SentimentPlugin):
                 api, params=parameters, timeout=3)
         except requests.exceptions.Timeout:
             raise Error("API does not response")
-
-        api_response = r.json()
+        try:
+            api_response = r.json()
+        except:
+            raise Error("Given endpoint is wrong")
         if not api_response.get('positivityCategory'):
             raise Error(r.json())
         self.log.debug(api_response)
-        agg_polarity, agg_polarityValue = self._polarity(
-            api_response.get('positivityCategory', None))
+        agg_polarity = self._polarity(api_response.get('positivityCategory'))
         normalized_text = api_response.get('normalizedText', None)
         agg_opinion = Sentiment(
             id="Opinion0",
@@ -85,38 +78,106 @@ class TaigerPlugin(SentimentPlugin):
 
         yield entry
 
-    @mock.patch('requests.get', side_effect=mocked_requests_get)
-    def test(self, *args, **kwargs):
-        params = {'algo': 'sentiment-taiger',
-                  'intype': 'direct',
-                  'expanded-jsonld': 0,
-                  'informat': 'text',
-                  'prefix': '',
-                  'plugin_type': 'analysisPlugin',
-                  'urischeme': 'RFC5147String',
-                  'outformat': 'json-ld',
-                  'i': 'I hate to say this',
-                  'input': 'I hate to say this',
-                  'conversion': 'full',
-                  'language': 'en',
-                  'apikey': '00000',
-                  'algorithm': 'sentiment-taiger'}
-        res_neg = next(self.analyse_entry(Entry(nif__isString="I hate to say this"), params))
-        res_pos = next(self.analyse_entry(Entry(nif__isString="This is amazing"), params))
-        res_neu = next(self.analyse_entry(Entry(nif__isString="The pillow is in the wardrobe"), params))
+    test_cases = [
+        {
+            'params': {
+                'algo': 'sentiment-taiger',
+                'intype': 'direct',
+                'expanded-jsonld': 0,
+                'informat': 'text',
+                'prefix': '',
+                'plugin_type': 'analysisPlugin',
+                'urischeme': 'RFC5147String',
+                'outformat': 'json-ld',
+                'conversion': 'full',
+                'language': 'en',
+                'apikey': '00000',
+                'algorithm': 'sentiment-taiger'
+            },
+            'input': 'I hate to say this',
+            'expected': {
+                'sentiments': [
+                    {'marl:hasPolarity': 'marl:Negative'}],
+            },
+            'responses': [
+                {
+                    'url':'http://34.244.91.7:8080/sentiment/classifyPositivity',
+                    'json': {
+                      "inputText": "I hate to say this",
+                      "normalizedText": "I hate to say this",
+                      "positivityScore": -1.8951251587831475,
+                      "positivityCategory": "neg"
+                    }
+                }
+            ]
+        },
+        {
+            'params': {
+                'algo': 'sentiment-taiger',
+                'intype': 'direct',
+                'expanded-jsonld': 0,
+                'informat': 'text',
+                'prefix': '',
+                'plugin_type': 'analysisPlugin',
+                'urischeme': 'RFC5147String',
+                'outformat': 'json-ld',
+                'conversion': 'full',
+                'language': 'en',
+                'apikey': '00000',
+                'algorithm': 'sentiment-taiger'
+            },
+            'input': 'This is amazing',
+            'expected': {
+                'sentiments': [
+                    {'marl:hasPolarity': 'marl:Positive'}],
+            },
+            'responses': [
+                {
+                    'url':'http://34.244.91.7:8080/sentiment/classifyPositivity',
+                    'json': {
+                      "inputText": "This is amazing ",
+                      "normalizedText": "This is amazing",
+                      "positivityScore": -1.4646806570973374,
+                      "positivityCategory": "pos"
+                    }
+                }
+            ]
+        },
+        {
+            'params': {
+                'algo': 'sentiment-taiger',
+                'intype': 'direct',
+                'expanded-jsonld': 0,
+                'informat': 'text',
+                'prefix': '',
+                'plugin_type': 'analysisPlugin',
+                'urischeme': 'RFC5147String',
+                'outformat': 'json-ld',
+                'conversion': 'full',
+                'language': 'en',
+                'apikey': '00000',
+                'algorithm': 'sentiment-taiger'
+            },
+            'input': 'The pillow is in the wardrobe',
+            'expected': {
+                'sentiments': [
+                    {'marl:hasPolarity': 'marl:Neutral'}],
+            },
+            'responses': [
+                {
+                    'url':'http://34.244.91.7:8080/sentiment/classifyPositivity',
+                    'json': {
+                      "inputText": "The pillow is in the wardrobe",
+                      "normalizedText": "The pillow is in the wardrobe",
+                      "positivityScore": -2.723999097522657,
+                      "positivityCategory": "neu"
+                    }
+                }
+            ]
+        }
 
-        check_template(res_neg,
-                       {'sentiments': [
-                           {'marl:hasPolarity': 'marl:Negative'}] 
-                       })
-        check_template(res_pos,
-                       {'sentiments': [
-                           {'marl:hasPolarity': 'marl:Positive'}] 
-                       })
-        check_template(res_neu,
-                       {'sentiments': [
-                           {'marl:hasPolarity': 'marl:Neutral'}] 
-                       })
+
+    ]
 
 
 if __name__ == '__main__':

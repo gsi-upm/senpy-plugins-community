@@ -9,24 +9,3 @@ services:
             - ".:/senpy-plugins"
         environment:
             TAIGER_ENDPOINT: 'http://34.244.91.7:8080/sentiment/classifyPositivity'
-    test:
-        image: gsiupm/senpy:latest
-        entrypoint: ["py.test"]
-        working_dir: "/usr/src/app/"
-        volumes:
-            - ".:/senpy-plugins/"
-        environment:
-            TAIGER_ENDPOINT: 'http://34.244.91.7:8080/sentiment/classifyPositivity'
-        command:
-          []
-    taiger:
-        image: "${IMAGENAME-gsiupm/meaningcloud}:${VERSION-dev}"
-        build:
-          context: .
-          dockerfile: Dockerfile-3.5
-        ports:
-            - 5001:5000
-        environment:
-            TAIGER_ENDPOINT: 'http://34.244.91.7:8080/sentiment/classifyPositivity'
-        volumes:
-            - "./data:/data"
