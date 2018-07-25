@@ -10,6 +10,7 @@ import time
 from senpy.plugins import SentimentPlugin
 from senpy.models import Results, Entry, Entity, Topic, Sentiment, Error
 
+
 TAIGER_ENDPOINT = os.environ.get("TAIGER_ENDPOINT")
 
 
@@ -165,7 +166,7 @@ class TaigerPlugin(SentimentPlugin):
             },
             'responses': [
                 {
-                    'url':'http://34.244.91.7:8080/sentiment/classifyPositivity',
+                    'url': TAIGER_ENDPOINT,
                     'json': {
                       "inputText": "The pillow is in the wardrobe",
                       "normalizedText": "The pillow is in the wardrobe",
