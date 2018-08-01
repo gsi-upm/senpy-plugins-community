@@ -11,7 +11,7 @@ from senpy.plugins import SentimentPlugin
 from senpy.models import Results, Entry, Entity, Topic, Sentiment, Error
 
 
-TAIGER_ENDPOINT = os.environ.get("TAIGER_ENDPOINT", 'http://34.244.91.7:8080/sentiment/classifyPositivity')
+TAIGER_ENDPOINT = os.environ.get("TAIGER_ENDPOINT", 'http://134.244.91.7:8080/sentiment/classifyPositivity')
 
 
 class TaigerPlugin(SentimentPlugin):
@@ -28,12 +28,6 @@ class TaigerPlugin(SentimentPlugin):
     maxPolarityValue = 0
     minPolarityValue = -10
 
-    extra_params = {
-        "endpoint": {
-            "aliases": ["endpoint"],
-            "required": False
-        }
-    }
     def _polarity(self, value):
 
         if 'neu' in value:
@@ -47,24 +41,20 @@ class TaigerPlugin(SentimentPlugin):
     def analyse_entry(self, entry, params):
 
         txt = entry['nif:isString']
-        if params.get("endpoint"):
-            api = params.get("endpoint", None)
-        else:
-            api = TAIGER_ENDPOINT
+        api = TAIGER_ENDPOINT
         parameters = {
             'inputText': txt
         }
         try:
             r = requests.get(
                 api, params=parameters, timeout=3)
-        except requests.exceptions.Timeout:
-            raise Error("API does not response")
-        try:
             api_response = r.json()
-        except:
-            raise Error("Given endpoint is wrong")
+        except requests.exceptions.Timeout:
+            raise Error("No response from the API")
+        except Exception as ex:
+            raise Error("There was a problem with the endpoint: {}".format(ex))
         if not api_response.get('positivityCategory'):
-            raise Error(r.json())
+            raise Error('No positive category in response: {}'.format(r.json()))
         self.log.debug(api_response)
         agg_polarity = self._polarity(api_response.get('positivityCategory'))
         normalized_text = api_response.get('normalizedText', None)
@@ -102,7 +92,7 @@ class TaigerPlugin(SentimentPlugin):
             },
             'responses': [
                 {
-                    'url':'http://34.244.91.7:8080/sentiment/classifyPositivity',
+                    'url': TAIGER_ENDPOINT,
                     'json': {
                       "inputText": "I hate to say this",
                       "normalizedText": "I hate to say this",
@@ -134,7 +124,7 @@ class TaigerPlugin(SentimentPlugin):
             },
             'responses': [
                 {
-                    'url':'http://34.244.91.7:8080/sentiment/classifyPositivity',
+                    'url': TAIGER_ENDPOINT,
                     'json': {
                       "inputText": "This is amazing ",
                       "normalizedText": "This is amazing",
