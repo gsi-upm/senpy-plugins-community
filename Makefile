@@ -15,7 +15,7 @@ all: build run
 test-fast-%:
 	docker run $(DOCKER_FLAGS) -v $$PWD/$*:/senpy-plugins/ -v $$PWD/data:/data/ --rm $(IMAGEWTAG) --only-test $(TEST_FLAGS)
 
-test-fast: test-fast-
+test-fast: test-fast-/
 
 test: docker-build test-fast
 
